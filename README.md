@@ -1,0 +1,2 @@
+# skattejakt
+prototype av skattejaktspillet
