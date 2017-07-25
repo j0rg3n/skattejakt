@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android2</string>
+    <string name="maps_label">Google Maps test view</string>
+    <string name="action_favorite">Favorite!</string>
+    <string name="action_settings">Settingz!\'</string>
+</resources>
