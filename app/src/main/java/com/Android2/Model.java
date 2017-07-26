@@ -12,21 +12,23 @@ import java.util.ArrayList;
 
 public class Model {
     public ArrayList<Node> nodes = new ArrayList<>();
-    public Node myLocation = new MyLocationNode();
+    public Node myLocation = new MyLocationNode(this);
 
     public Model() {
         nodes.add(myLocation);
 
-        LockedNode bauen = new LockedNode();
-        bauen.location = new LatLng(59.12446, 11.18585);
-        nodes.add(bauen);
+        addLockedNode(new LatLng(59.12446, 11.18585));
     }
 
     @NonNull
     LockedNode addLockedNode(LatLng latLng) {
-        LockedNode newNode = new LockedNode();
+        LockedNode newNode = new LockedNode(this);
         newNode.location = latLng;
         nodes.add(newNode);
         return newNode;
+    }
+
+    public boolean remove(Node node) {
+        return nodes.remove(node);
     }
 }

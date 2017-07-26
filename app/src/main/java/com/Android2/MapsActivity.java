@@ -9,11 +9,10 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -22,7 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 //public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, MapController.OnSelectionChangeListener {
 
     private static final String REQUESTING_LOCATION_UPDATES_KEY = "requestingLocationUpdates";
 
@@ -54,6 +53,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+
+        mapController.setOnSelectionChanged(this);
 
         // Load sounds
         // TODO: Don't do this every time the activity is initialized, like when
@@ -126,6 +127,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.map_action_bar_menu, menu);
+        menu.findItem(R.id.action_favorite).setVisible(mapController.selectedNode instanceof IRemovable);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mapController = new MapController(model);
         mapController.setup(googleMap);
@@ -155,6 +163,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mRequestingLocationUpdates);
         // ...
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onSelectionChanged() {
+        invalidateOptionsMenu();
     }
 
     @Override

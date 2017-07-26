@@ -6,17 +6,32 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by cirkus on 24.07.2017.
  */
 
 public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnCircleClickListener, GoogleMap.OnMarkerDragListener {
-    private List<IMapNodeController> mapRenderers = new ArrayList<>();
-    private GoogleMap mMap;
-    private Model model;
+    public IMapNodeController selectedNode;
+    private OnSelectionChangeListener onSelectionChanged;
+
+    public void remove(IMapNodeController mapNodeController) {
+        if (mapNodeController == selectedNode) {
+            setSelectedNode(null);
+        }
+        model.remove(mapNodeController.getNode());
+    }
+
+    public interface OnSelectionChangeListener {
+        void onSelectionChanged();
+    }
+
+    public void setOnSelectionChanged(OnSelectionChangeListener onSelectionChanged) {
+        this.onSelectionChanged = onSelectionChanged;
+    }
+
+    public OnSelectionChangeListener getOnSelectionChanged() {
+        return onSelectionChanged;
+    }
 
     public MapController(Model model) {
         this.model = model;
@@ -54,11 +69,24 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
     public void onMapClick(LatLng latLng) {
         LockedNode newNode = model.addLockedNode(latLng);
         renderNode(newNode);
+
+        setSelectedNode(newNode.mapNodeController);
+    }
+
+    private void setSelectedNode(IMapNodeController newSelectedNode) {
+        selectedNode = newSelectedNode;
+        dispatcheSelectionChanged();
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        return dispatchClick(marker.getTag());
+        Object tag = marker.getTag();
+        if (tag instanceof IMapNodeController) {
+            setSelectedNode((IMapNodeController) tag);
+        } else {
+            setSelectedNode(null);
+        }
+        return dispatchClick(tag);
     }
 
     @Override
@@ -95,4 +123,13 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
         return false;
     }
 
+    private void dispatcheSelectionChanged() {
+        if (selectionChangeListener != null) {
+            selectionChangeListener.onSelectionChanged();
+        }
+    }
+
+    private GoogleMap mMap;
+    private Model model;
+    private OnSelectionChangeListener selectionChangeListener;
 }
