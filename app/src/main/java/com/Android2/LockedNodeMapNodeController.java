@@ -9,9 +9,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Created by cirkus on 24.07.2017.
  */
 
-public class LockedNodeMapNodeController implements IMapNodeController, IDraggable, IRemovable {
+public class LockedNodeMapNodeController extends MapNodeControllerBase<LockedNode> implements  IDraggable, IRemovable {
     public LockedNodeMapNodeController(LockedNode node, MapController mapController) {
-        this.node = node;
+        super(node);
         this.mapController = mapController;
     }
 
@@ -45,7 +45,6 @@ public class LockedNodeMapNodeController implements IMapNodeController, IDraggab
         mapController.remove(this);
     }
 
-    private LockedNode node;
     private MapController mapController;
     private Marker marker;
 }

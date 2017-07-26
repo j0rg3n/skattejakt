@@ -7,5 +7,7 @@ import com.google.android.gms.maps.GoogleMap;
  */
 
 public interface IMapNodeController {
-    public void render(GoogleMap map);
+    void render(GoogleMap map);
+
+    Node getNode();
 }

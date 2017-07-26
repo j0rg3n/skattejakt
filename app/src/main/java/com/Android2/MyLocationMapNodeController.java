@@ -10,9 +10,9 @@ import com.google.android.gms.maps.model.CircleOptions;
  * Created by cirkus on 24.07.2017.
  */
 
-public class MyLocationMapNodeController implements IMapNodeController {
-    public MyLocationMapNodeController(Node node) {
-        this.node = node;
+public class MyLocationMapNodeController extends MapNodeControllerBase<MyLocationNode> {
+    public MyLocationMapNodeController(MyLocationNode node) {
+        super(node);
     }
 
     @Override
@@ -37,5 +37,4 @@ public class MyLocationMapNodeController implements IMapNodeController {
     }
 
     private Circle circle;
-    private Node node;
 }
