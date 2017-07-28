@@ -12,13 +12,22 @@ import com.google.android.gms.maps.model.Marker;
 
 public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnCircleClickListener, GoogleMap.OnMarkerDragListener {
     public IMapNodeController selectedNode;
-    private OnSelectionChangeListener onSelectionChanged;
 
-    public void remove(IMapNodeController mapNodeController) {
+    public void removeNodeController(IMapNodeController mapNodeController) {
         if (mapNodeController == selectedNode) {
-            setSelectedNode(null);
+            clearSelectedNode();
         }
         model.remove(mapNodeController.getNode());
+    }
+
+    public boolean canRemoveSelectedNode() {
+        return selectedNode instanceof IRemovable;
+    }
+
+    public void removeSelectedNode() {
+        if (canRemoveSelectedNode()) {
+            ((IRemovable)selectedNode).remove();
+        }
     }
 
     public interface OnSelectionChangeListener {
@@ -49,6 +58,10 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
 
         LatLng bauen = new LatLng(59.12446, 11.18585);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bauen, 16));
+
+        for (Node node : model.nodes) {
+            addNodeController(node);
+        }
     }
 
     public void refresh() {
@@ -68,14 +81,32 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
     @Override
     public void onMapClick(LatLng latLng) {
         LockedNode newNode = model.addLockedNode(latLng);
-        renderNode(newNode);
+        onNodeAdded(newNode);
+    }
 
-        setSelectedNode(newNode.mapNodeController);
+    private void onNodeAdded(Node newNode) {
+        addNodeController(newNode);
+        renderNode(newNode);
+        setSelectedNode(newNode);
+    }
+
+    private void addNodeController(Node newNode) {
+        if (newNode instanceof LockedNode) {
+            newNode.mapNodeController = new LockedNodeMapNodeController((LockedNode)newNode, this);
+        } else if (newNode instanceof MyLocationNode) {
+            newNode.mapNodeController = new MyLocationMapNodeController((MyLocationNode) newNode);
+        }
+    }
+
+    private void setSelectedNode(Node newNode) {
+        if (newNode.mapNodeController != null) {
+            setSelectedNode(newNode.mapNodeController);
+        }
     }
 
     private void setSelectedNode(IMapNodeController newSelectedNode) {
         selectedNode = newSelectedNode;
-        dispatcheSelectionChanged();
+        dispatchSelectionChanged();
     }
 
     @Override
@@ -84,9 +115,13 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
         if (tag instanceof IMapNodeController) {
             setSelectedNode((IMapNodeController) tag);
         } else {
-            setSelectedNode(null);
+            clearSelectedNode();
         }
         return dispatchClick(tag);
+    }
+
+    private void clearSelectedNode() {
+        setSelectedNode((IMapNodeController) null);
     }
 
     @Override
@@ -123,13 +158,13 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
         return false;
     }
 
-    private void dispatcheSelectionChanged() {
-        if (selectionChangeListener != null) {
-            selectionChangeListener.onSelectionChanged();
+    private void dispatchSelectionChanged() {
+        if (onSelectionChanged != null) {
+            onSelectionChanged.onSelectionChanged();
         }
     }
 
     private GoogleMap mMap;
     private Model model;
-    private OnSelectionChangeListener selectionChangeListener;
+    private OnSelectionChangeListener onSelectionChanged;
 }

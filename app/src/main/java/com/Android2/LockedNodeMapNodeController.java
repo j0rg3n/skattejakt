@@ -42,7 +42,11 @@ public class LockedNodeMapNodeController extends MapNodeControllerBase<LockedNod
 
     @Override
     public void remove() {
-        mapController.remove(this);
+        if (marker != null) {
+            marker.remove();
+            marker = null;
+        }
+        mapController.removeNodeController(this);
     }
 
     private MapController mapController;

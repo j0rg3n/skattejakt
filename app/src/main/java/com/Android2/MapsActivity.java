@@ -54,8 +54,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        mapController.setOnSelectionChanged(this);
-
         // Load sounds
         // TODO: Don't do this every time the activity is initialized, like when
         // rotating the view.
@@ -129,7 +127,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.map_action_bar_menu, menu);
-        menu.findItem(R.id.action_favorite).setVisible(mapController.selectedNode instanceof IRemovable);
+        menu.findItem(R.id.action_favorite).setVisible(mapController != null && mapController.canRemoveSelectedNode());
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -137,6 +135,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mapController = new MapController(model);
         mapController.setup(googleMap);
+        mapController.setOnSelectionChanged(this);
         mapController.refresh();
 
         ready = true;
@@ -180,6 +179,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.action_favorite:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
+                if (mapController != null) {
+                    mapController.removeSelectedNode();
+                }
                 return true;
 
             default:

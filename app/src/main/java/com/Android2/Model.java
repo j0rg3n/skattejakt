@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class Model {
     public ArrayList<Node> nodes = new ArrayList<>();
-    public Node myLocation = new MyLocationNode(this);
+    public Node myLocation = new MyLocationNode();
 
     public Model() {
         nodes.add(myLocation);
@@ -22,7 +22,7 @@ public class Model {
 
     @NonNull
     LockedNode addLockedNode(LatLng latLng) {
-        LockedNode newNode = new LockedNode(this);
+        LockedNode newNode = new LockedNode();
         newNode.location = latLng;
         nodes.add(newNode);
         return newNode;

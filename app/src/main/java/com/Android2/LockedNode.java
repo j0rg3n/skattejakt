@@ -6,6 +6,5 @@ package com.Android2;
 
 public class LockedNode extends Node {
     public LockedNode() {
-        mapNodeController = new LockedNodeMapNodeController(this);
     }
 }

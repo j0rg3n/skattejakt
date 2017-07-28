@@ -6,6 +6,5 @@ package com.Android2;
 
 public class MyLocationNode extends Node {
     public MyLocationNode() {
-        mapNodeController = new MyLocationMapNodeController(this);
     }
 }
