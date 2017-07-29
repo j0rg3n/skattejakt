@@ -2,11 +2,14 @@ package com.Android2;
 
 // From https://github.com/googlemaps/android-samples/tree/master/ApiDemos
 
+import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +26,8 @@ import com.google.android.gms.maps.model.Marker;
 //public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, MapController.OnSelectionChangeListener {
 
+    public static final int REQUEST_CODE_SCAN = 1;
+
     private static final String REQUESTING_LOCATION_UPDATES_KEY = "requestingLocationUpdates";
 
     private MapController mapController;
@@ -31,12 +36,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SoundPool soundPool;
     private int soundID = -1;
     private boolean loaded = false;
-    private float volume = 1.f;
+    private float volume = .025f;
     private boolean ready = false;
 
     private boolean mRequestingLocationUpdates = false;
     private CustomLocationManager locationManager;
-    private Marker myLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,13 +112,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-        CustomLocationRequest customLocationRequest = new CustomLocationRequest();
-        customLocationRequest.setPollInterval(2000);
-        customLocationRequest.setLocationProvider(LocationManager.GPS_PROVIDER);
-        customLocationRequest.setNumberOfUpdates(0);
-        customLocationRequest.setMinDistanceForPoll(0);
-        locationManager.requestLocation(this, customLocationRequest);
-
         updateValuesFromBundle(savedInstanceState);
     }
 
@@ -174,6 +171,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
+                beginScanQRCode();
                 return true;
 
             case R.id.action_favorite:
@@ -192,8 +190,65 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    void beginScanQRCode() {
+        Intent intent = new Intent(this, QRScannerActivity.class);
+        //String message = editText.getText().toString();
+        //intent.putExtra(QR_EXTRA_MESSAGE_KEY, message);
+        startActivityForResult(intent, REQUEST_CODE_SCAN);
+
+        /*
+        try {
+
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE" for bar codes
+            intent.
+
+            startActivityForResult(intent, 0);
+
+        } catch (Exception e) {
+
+            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+            startActivity(marketIntent);
+
+        }
+        */
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_SCAN) {
+            if (resultCode == RESULT_OK && data != null) {
+                String contents = data.getStringExtra(QRScannerActivity.QR_EXTRA_MESSAGE_KEY);
+                if (mapController != null && mapController.selectedNode != null && mapController.selectedNode.getNode() instanceof  LockedNode) {
+                    ((LockedNode)mapController.selectedNode.getNode()).qrCode = contents;
+                    refreshMap();
+                }
+            } else {
+                if (resultCode == RESULT_CANCELED) {
+                    //handle cancel
+                } else {
+                    //handle other weird cases
+                }
+            }
+        }
+    }
+
     private void startLocationUpdates() {
-        locationManager.connect();
+        Context context = getApplicationContext();
+        locationManager.connect(context);
+
+        CustomLocationRequest customLocationRequest = new CustomLocationRequest();
+        customLocationRequest.setPollInterval(2000);
+        customLocationRequest.setLocationProvider(LocationManager.GPS_PROVIDER);
+        customLocationRequest.setNumberOfUpdates(0);
+        customLocationRequest.setMinDistanceForPoll(0);
+
+        locationManager.requestLocation(context, customLocationRequest);
+
     }
 
     private void stopLocationUpdates() {
@@ -218,6 +273,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void playSound() {
         if (loaded && ready) {
+
             soundPool.play(soundID, volume, volume, 1, 0, 1f);
             ready = false; //< kludge to avoid playing twice
         }

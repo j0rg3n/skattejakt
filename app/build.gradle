@@ -59,4 +59,6 @@ dependencies {
     // https://android-developers.googleblog.com/2016/11/google-play-services-and-firebase-for-android-will-support-api-level-14-at-minimum.html?hl=be
     compile 'com.google.android.gms:play-services-maps:10.0.1'
     //compile 'com.google.android.gms:play-services-location:10.0.1'
+    compile 'me.dm7.barcodescanner:zxing:1.9'
+    //compile 'com.google.android.gms:play-services-vision:9.6.1'
 }

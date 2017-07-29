@@ -10,9 +10,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.SyncStateContract.Constants;
 import android.support.v4.app.ActivityCompat;
+
+import java.util.logging.Logger;
 
 
 public class CustomLocationManager {
@@ -64,15 +67,26 @@ public class CustomLocationManager {
             , OnConnectionChangeCallback cc
             , OnConnectionFailedCallback cfc) {
 
-        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
         mLcc = cb;
         mCc = cc;
         mCfc = cfc;
 
         mOldLocation = null;
         mNewLocation = null;
+    }
 
+    public boolean isProviderEnabled() {
+        if (mIsNetworkLocationAvailable || mIsGPSLocationAvailable)
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * Tries to connect to location services
+     */
+    public void connect(Context context) {
+        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Register for new location updates from the LocationManager
         mLocationListener = new LocationListener() {
@@ -111,19 +125,7 @@ public class CustomLocationManager {
             }
 
         };
-    }
 
-    public boolean isProviderEnabled() {
-        if (mIsNetworkLocationAvailable || mIsGPSLocationAvailable)
-            return true;
-        else
-            return false;
-    }
-
-    /**
-     * Tries to connect to location services
-     */
-    public void connect() {
         // If any of the location provider is available, invoke onConnected
         // else invoke onConnectionFailed
         mIsGPSLocationAvailable = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);

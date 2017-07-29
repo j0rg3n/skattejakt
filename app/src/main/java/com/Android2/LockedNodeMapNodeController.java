@@ -1,5 +1,7 @@
 package com.Android2;
 
+import android.support.annotation.NonNull;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -20,10 +22,12 @@ public class LockedNodeMapNodeController extends MapNodeControllerBase<LockedNod
         if (node.location != null) {
             if (marker != null) {
                 marker.setPosition(node.location);
+                marker.setSnippet(getQRCodeDescription());
             } else {
                 marker = map.addMarker(new MarkerOptions()
                         .position(node.location)
                         .title("Markør ved Bauen")
+                        .snippet(getQRCodeDescription())
                         .draggable(true));
                 marker.setTag(this);
             }
@@ -47,6 +51,11 @@ public class LockedNodeMapNodeController extends MapNodeControllerBase<LockedNod
             marker = null;
         }
         mapController.removeNodeController(this);
+    }
+
+    @NonNull
+    private String getQRCodeDescription() {
+        return node.qrCode != null ? node.qrCode : "<ingen kode>";
     }
 
     private MapController mapController;
