@@ -9,22 +9,26 @@ import android.location.LocationManager;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 
 //public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, MapController.OnSelectionChangeListener {
+//public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, MapController.OnSelectionChangeListener {
+public class MapsActivity extends Fragment implements OnMapReadyCallback, MapController.OnSelectionChangeListener, IHasActionBarItems {
 
     public static final int REQUEST_CODE_SCAN = 1;
 
@@ -42,21 +46,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean mRequestingLocationUpdates = false;
     private CustomLocationManager locationManager;
 
+    private FragmentActivity hostActivity;
+    private OnActionBarItemEnabledChangedListener enabledChangedListener;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        hostActivity = (FragmentActivity) context;
+    }
 
-        // Setup google maps view
-
-        setContentView(R.layout.activity_maps);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
         // Setup toolbar as Action Bar
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
+        /*Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);*/
 
         // Load sounds
         // TODO: Don't do this every time the activity is initialized, like when
@@ -82,11 +89,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 playSound();
             }
         });
-        soundID = soundPool.load(this, R.raw.blip, 1);
+        soundID = soundPool.load(hostActivity, R.raw.blip, 1);
 
         // Geolocation
 
-        locationManager = new CustomLocationManager(getApplicationContext(),
+        locationManager = new CustomLocationManager(hostActivity.getApplicationContext(),
                 new CustomLocationManager.OnLocationChangeListener() {
                     @Override
                     public void onLocationChange(Location location) {
@@ -113,19 +120,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
 
         updateValuesFromBundle(savedInstanceState);
+
+        return inflater.inflate(R.layout.activity_maps, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Setup google maps view
+    }
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+
+        /*SupportMapFragment mapFragment = (SupportMapFragment) hostActivity.getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }*/
+        if (childFragment instanceof SupportMapFragment) {
+            ((SupportMapFragment)childFragment).getMapAsync(this);
+        }
     }
 
     private void refreshMap() {
         if (mapController != null) {
             mapController.refresh();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.map_action_bar_menu, menu);
-        menu.findItem(R.id.action_favorite).setVisible(mapController != null && mapController.canRemoveSelectedNode());
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -140,7 +163,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
@@ -148,13 +171,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         stopLocationUpdates();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY,
                 mRequestingLocationUpdates);
         // ...
@@ -163,35 +186,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onSelectionChanged() {
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
-                beginScanQRCode();
-                return true;
-
-            case R.id.action_favorite:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
-                if (mapController != null) {
-                    mapController.removeSelectedNode();
-                }
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-
+        if (enabledChangedListener != null) {
+            enabledChangedListener.onActionBarItemEnabledChanged();
         }
     }
 
+    @Override
+    public void onDetach() {
+        if (enabledChangedListener != null) {
+            enabledChangedListener.onHasActionBarItemsDetach();
+            enabledChangedListener = null;
+        }
+
+        super.onDetach();
+    }
+
     void beginScanQRCode() {
-        Intent intent = new Intent(this, QRScannerActivity.class);
+        Intent intent = new Intent(hostActivity, QRScannerActivity.class);
         //String message = editText.getText().toString();
         //intent.putExtra(QR_EXTRA_MESSAGE_KEY, message);
         startActivityForResult(intent, REQUEST_CODE_SCAN);
@@ -217,7 +228,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_SCAN) {
@@ -238,7 +249,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void startLocationUpdates() {
-        Context context = getApplicationContext();
+        Context context = hostActivity.getApplicationContext();
         locationManager.connect(context);
 
         CustomLocationRequest customLocationRequest = new CustomLocationRequest();
@@ -277,5 +288,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             soundPool.play(soundID, volume, volume, 1, 0, 1f);
             ready = false; //< kludge to avoid playing twice
         }
+    }
+
+    @Override
+    public void setOnActionBarItemEnabledEnabledChanged(OnActionBarItemEnabledChangedListener listener) {
+        enabledChangedListener = listener;
+    }
+
+    @Override
+    public boolean isActionBarItemEnabled(int itemId) {
+        switch (itemId) {
+            case R.id.action_delete:
+                return mapController != null && mapController.canRemoveSelectedNode();
+            case R.id.action_scan_code:
+                return mapController != null && mapController.selectedNode != null; //< todo: scannable thingy
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public int[] getOwnedActionBarItemIds() {
+        return new int[] {
+            R.id.action_delete,
+                R.id.action_scan_code
+        };
+    }
+
+    @Override
+    public boolean onActionBarItemSelected(int itemId) {
+        switch (itemId) {
+            case R.id.action_scan_code:
+                beginScanQRCode();
+                return true;
+
+            case R.id.action_delete:
+                if (mapController != null) {
+                    mapController.removeSelectedNode();
+                }
+                return true;
+        }
+        return false;
     }
 }

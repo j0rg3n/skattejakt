@@ -3,6 +3,7 @@ package com.Android2;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -28,7 +29,8 @@ public class LockedNodeMapNodeController extends MapNodeControllerBase<LockedNod
                         .position(node.location)
                         .title("Markør ved Bauen")
                         .snippet(getQRCodeDescription())
-                        .draggable(true));
+                        .draggable(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bug_report_black_24dp)));
                 marker.setTag(this);
             }
         } else {
