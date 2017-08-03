@@ -43,6 +43,28 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // If we're being restored from a previous state,
+        // then we don't need to do anything and should return or else
+        // we could end up with overlapping fragments.
+        if (savedInstanceState == null) {
+            // Check that the activity is using the layout version with
+            // the fragment_container FrameLayout
+            assert(findViewById(R.id.fragment_container) != null);
+
+            // Create a new Fragment to be placed in the activity layout
+            MapsActivity firstFragment = new MapsActivity();
+
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            //firstFragment.setArguments(getIntent().getExtras());
+
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragment_container, firstFragment)
+                    .commit();
+        }
     }
 
     @Override
