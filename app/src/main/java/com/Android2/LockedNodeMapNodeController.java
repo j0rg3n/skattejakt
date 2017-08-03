@@ -24,6 +24,10 @@ public class LockedNodeMapNodeController extends MapNodeControllerBase<LockedNod
             if (marker != null) {
                 marker.setPosition(node.location);
                 marker.setSnippet(getQRCodeDescription());
+                if (marker.isInfoWindowShown()) {
+                    // force refresh if info window shown.
+                    marker.showInfoWindow();
+                }
             } else {
                 marker = map.addMarker(new MarkerOptions()
                         .position(node.location)
