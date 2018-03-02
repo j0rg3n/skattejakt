@@ -32,7 +32,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, MapCon
 
     public static final int REQUEST_CODE_SCAN = 1;
 
-    private static final String REQUESTING_LOCATION_UPDATES_KEY = "requestingLocationUpdates";
+    private static final String BUNDLE_REQUESTING_LOCATION_UPDATES_KEY = "requestingLocationUpdates";
+    private static final String BUNDLE_MODEL_KEY = "model";
 
     private MapController mapController;
     private Model model = new Model();
@@ -172,16 +173,31 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, MapCon
 
     @Override
     public void onPause() {
-        super.onPause();
         stopLocationUpdates();
+        super.onPause();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY,
-                mRequestingLocationUpdates);
-        // ...
+        outState.putBoolean(BUNDLE_REQUESTING_LOCATION_UPDATES_KEY, mRequestingLocationUpdates);
+        outState.putParcelable(BUNDLE_MODEL_KEY, model);
         super.onSaveInstanceState(outState);
+    }
+
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.keySet().contains(BUNDLE_REQUESTING_LOCATION_UPDATES_KEY)) {
+                mRequestingLocationUpdates = savedInstanceState.getBoolean(BUNDLE_REQUESTING_LOCATION_UPDATES_KEY);
+            } else {
+                mRequestingLocationUpdates = true;
+            }
+
+            if (savedInstanceState.keySet().contains(BUNDLE_MODEL_KEY)) {
+                model = savedInstanceState.getParcelable(BUNDLE_MODEL_KEY);
+            } else {
+                model = new Model();
+            }
+        }
     }
 
     @Override
@@ -263,23 +279,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, MapCon
     }
 
     private void stopLocationUpdates() {
-        locationManager.disconnect();
-    }
-
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
-        // Update the value of mRequestingLocationUpdates from the Bundle.
-        if (savedInstanceState != null) {
-            if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
-                mRequestingLocationUpdates = savedInstanceState.getBoolean(
-                        REQUESTING_LOCATION_UPDATES_KEY);
-            }
-        } else {
-            mRequestingLocationUpdates = true;
-        }
-        // ...
-
-        // Update UI to match restored state
-        //updateUI();
+        //if (locationManager != null) {
+            locationManager.disconnect();
+        //}
     }
 
     private void playSound() {

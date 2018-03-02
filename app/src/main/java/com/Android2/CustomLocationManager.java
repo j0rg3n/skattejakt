@@ -140,8 +140,9 @@ public class CustomLocationManager {
      *  Remove location updates from the Location Manager
      */
     public void disconnect() {
-
-        mLocationManager.removeUpdates(mLocationListener);
+        if (mLocationManager != null) {
+            mLocationManager.removeUpdates(mLocationListener);
+        }
         mLocationManager = null;
         mLocationListener = null;
     }
