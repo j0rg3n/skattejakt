@@ -1,7 +1,9 @@
-package com.Android2;
+package com.Android2.controller;
 
 import android.support.annotation.NonNull;
 
+import com.Android2.R;
+import com.Android2.model.POIMapNode;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -12,8 +14,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Created by cirkus on 24.07.2017.
  */
 
-public class LockedNodeMapNodeController extends MapNodeControllerBase<LockedNode> implements  IDraggable, IRemovable {
-    public LockedNodeMapNodeController(LockedNode node, MapController mapController) {
+public class LockedNodeMapNodeController extends MapNodeControllerBase<POIMapNode> implements IDraggable, IRemovable {
+    public LockedNodeMapNodeController(POIMapNode node, PrimaryMapController mapController) {
         super(node);
         this.mapController = mapController;
     }
@@ -64,6 +66,6 @@ public class LockedNodeMapNodeController extends MapNodeControllerBase<LockedNod
         return node.qrCode != null ? node.qrCode : "<ingen kode>";
     }
 
-    private MapController mapController;
+    private PrimaryMapController mapController;
     private Marker marker;
 }

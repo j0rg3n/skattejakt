@@ -1,22 +1,23 @@
-package com.Android2;
+package com.Android2.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.Android2.controller.IMapNodeController;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by cirkus on 24.07.2017.
  */
 
-public class Node implements Parcelable {
+public class MapNode implements Parcelable {
     public LatLng location = null;
     public IMapNodeController mapNodeController = null;
 
-    public Node() {
+    public MapNode() {
     }
 
-    protected Node(Parcel in) {
+    protected MapNode(Parcel in) {
         location = in.readParcelable(null);
     }
 
@@ -30,10 +31,10 @@ public class Node implements Parcelable {
         return 0;
     }
 
-    public static final Creator<Node> CREATOR = new Creator<Node>() {
+    public static final Creator<MapNode> CREATOR = new Creator<MapNode>() {
         @Override
-        public Node createFromParcel(Parcel in) { return new Node(in); }
+        public MapNode createFromParcel(Parcel in) { return new MapNode(in); }
         @Override
-        public Node[] newArray(int size) { return new Node[size]; }
+        public MapNode[] newArray(int size) { return new MapNode[size]; }
     };
 }

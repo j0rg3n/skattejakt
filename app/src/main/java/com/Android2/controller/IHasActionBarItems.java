@@ -1,10 +1,10 @@
-package com.Android2;
+package com.Android2.controller;
 
 /**
  * Created by cirkus on 03.08.2017.
  */
 
-interface IHasActionBarItems {
+public interface IHasActionBarItems {
     void setOnActionBarItemEnabledEnabledChanged(OnActionBarItemEnabledChangedListener listener);
     boolean isActionBarItemEnabled(int itemId);
     int[] getOwnedActionBarItemIds();

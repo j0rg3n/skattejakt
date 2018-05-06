@@ -1,9 +1,9 @@
-package com.Android2;
+package com.Android2.controller;
 
 /**
  * Created by cirkus on 26.07.2017.
  */
 
-interface IRemovable {
+public interface IRemovable {
     void remove();
 }

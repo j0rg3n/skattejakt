@@ -1,5 +1,9 @@
-package com.Android2;
+package com.Android2.controller;
 
+import com.Android2.model.MapArea;
+import com.Android2.model.MapNode;
+import com.Android2.model.POIMapNode;
+import com.Android2.model.MyLocationMapNode;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
@@ -10,7 +14,7 @@ import com.google.android.gms.maps.model.Marker;
  * Created by cirkus on 24.07.2017.
  */
 
-public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnCircleClickListener, GoogleMap.OnMarkerDragListener {
+public class PrimaryMapController implements GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnCircleClickListener, GoogleMap.OnMarkerDragListener {
     public IMapNodeController selectedNode;
 
     public void removeNodeController(IMapNodeController mapNodeController) {
@@ -42,7 +46,7 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
         return onSelectionChanged;
     }
 
-    public MapController(Model model) {
+    public PrimaryMapController(MapArea model) {
         this.model = model;
     }
 
@@ -59,20 +63,20 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
         LatLng bauen = new LatLng(59.12446, 11.18585);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bauen, 16));
 
-        for (Node node : model.nodes) {
+        for (MapNode node : model.nodes) {
             addNodeController(node);
         }
     }
 
     public void refresh() {
         if (mMap != null) {
-            for (Node node : model.nodes) {
+            for (MapNode node : model.nodes) {
                 renderNode(node);
             }
         }
     }
 
-    private void renderNode(Node node) {
+    private void renderNode(MapNode node) {
         if (node.mapNodeController != null) {
             node.mapNodeController.render(mMap);
         }
@@ -80,25 +84,25 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
 
     @Override
     public void onMapClick(LatLng latLng) {
-        LockedNode newNode = model.addLockedNode(latLng);
+        POIMapNode newNode = model.addLockedNode(latLng);
         onNodeAdded(newNode);
     }
 
-    private void onNodeAdded(Node newNode) {
+    private void onNodeAdded(MapNode newNode) {
         addNodeController(newNode);
         renderNode(newNode);
         setSelectedNode(newNode);
     }
 
-    private void addNodeController(Node newNode) {
-        if (newNode instanceof LockedNode) {
-            newNode.mapNodeController = new LockedNodeMapNodeController((LockedNode)newNode, this);
-        } else if (newNode instanceof MyLocationNode) {
-            newNode.mapNodeController = new MyLocationMapNodeController((MyLocationNode) newNode);
+    private void addNodeController(MapNode newNode) {
+        if (newNode instanceof POIMapNode) {
+            newNode.mapNodeController = new LockedNodeMapNodeController((POIMapNode)newNode, this);
+        } else if (newNode instanceof MyLocationMapNode) {
+            newNode.mapNodeController = new MyLocationMapNodeController((MyLocationMapNode) newNode);
         }
     }
 
-    private void setSelectedNode(Node newNode) {
+    private void setSelectedNode(MapNode newNode) {
         if (newNode.mapNodeController != null) {
             setSelectedNode(newNode.mapNodeController);
         }
@@ -165,6 +169,6 @@ public class MapController implements GoogleMap.OnMapClickListener, GoogleMap.On
     }
 
     private GoogleMap mMap;
-    private Model model;
+    private MapArea model;
     private OnSelectionChangeListener onSelectionChanged;
 }

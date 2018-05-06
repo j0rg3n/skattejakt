@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.Android2.MainActivity">
+    tools:context="com.Android2.view.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -32,18 +32,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="com.Android2.MainActivity"
+        tools:context="com.Android2.view.MainActivity"
         tools:showIn="@layout/app_bar_main">
 
         <!--
-        <fragment android:name="com.Android2.MapsActivity"
+        <fragment android:name="com.Android2.PrimaryMapFragmentagment"
             android:id="@+id/maps_activity"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         -->
     </android.support.constraint.ConstraintLayout>
     <!--
-    <android.support.v4.app.Fragment android:name="com.Android2.MapsActivity"
+    <android.support.v4.app.Fragment android:name="com.Android2.PrimaryMapFragmentagment"
         android:id="@+id/maps_activity"
         android:layout_width="match_parent" android:layout_height="match_parent" />
         -->

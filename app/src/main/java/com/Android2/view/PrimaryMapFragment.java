@@ -1,4 +1,4 @@
-package com.Android2;
+package com.Android2.view;
 
 // From https://github.com/googlemaps/android-samples/tree/master/ApiDemos
 
@@ -18,6 +18,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.Android2.controller.IHasActionBarItems;
+import com.Android2.R;
+import com.Android2.controller.PrimaryMapController;
+import com.Android2.model.MapArea;
+import com.Android2.model.CustomLocationManager;
+import com.Android2.model.CustomLocationRequest;
+import com.Android2.model.POIMapNode;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -26,17 +33,17 @@ import com.google.android.gms.maps.model.LatLng;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-//public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-//public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, MapController.OnSelectionChangeListener {
-public class MapsActivity extends Fragment implements OnMapReadyCallback, MapController.OnSelectionChangeListener, IHasActionBarItems {
+//public class PrimaryMapFragment extends FragmentActivity implements OnMapReadyCallback {
+//public class PrimaryMapFragment extends AppCompatActivity implements OnMapReadyCallback, PrimaryMapController.OnSelectionChangeListener {
+public class PrimaryMapFragment extends Fragment implements OnMapReadyCallback, PrimaryMapController.OnSelectionChangeListener, IHasActionBarItems {
 
     public static final int REQUEST_CODE_SCAN = 1;
 
     private static final String BUNDLE_REQUESTING_LOCATION_UPDATES_KEY = "requestingLocationUpdates";
     private static final String BUNDLE_MODEL_KEY = "model";
 
-    private MapController mapController;
-    private Model model = new Model();
+    private PrimaryMapController mapController;
+    private MapArea model = new MapArea();
 
     private SoundPool soundPool;
     private int soundID = -1;
@@ -154,7 +161,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, MapCon
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mapController = new MapController(model);
+        mapController = new PrimaryMapController(model);
         mapController.setup(googleMap);
         mapController.setOnSelectionChanged(this);
         mapController.refresh();
@@ -195,7 +202,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, MapCon
             if (savedInstanceState.keySet().contains(BUNDLE_MODEL_KEY)) {
                 model = savedInstanceState.getParcelable(BUNDLE_MODEL_KEY);
             } else {
-                model = new Model();
+                model = new MapArea();
             }
         }
     }
@@ -250,8 +257,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, MapCon
         if (requestCode == REQUEST_CODE_SCAN) {
             if (resultCode == RESULT_OK && data != null) {
                 String contents = data.getStringExtra(QRScannerActivity.QR_EXTRA_MESSAGE_KEY);
-                if (mapController != null && mapController.selectedNode != null && mapController.selectedNode.getNode() instanceof  LockedNode) {
-                    ((LockedNode)mapController.selectedNode.getNode()).qrCode = contents;
+                if (mapController != null && mapController.selectedNode != null && mapController.selectedNode.getNode() instanceof POIMapNode) {
+                    ((POIMapNode)mapController.selectedNode.getNode()).qrCode = contents;
                     refreshMap();
                 }
             } else {

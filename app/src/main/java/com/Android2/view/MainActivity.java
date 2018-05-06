@@ -1,4 +1,4 @@
-package com.Android2;
+package com.Android2.view;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -13,6 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.Android2.controller.IHasActionBarItems;
+import com.Android2.R;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -53,7 +56,7 @@ public class MainActivity extends AppCompatActivity
             assert(findViewById(R.id.fragment_container) != null);
 
             // Create a new Fragment to be placed in the activity layout
-            MapsActivity firstFragment = new MapsActivity();
+            PrimaryMapFragment firstFragment = new PrimaryMapFragment();
 
             // In case this activity was started with special instructions from an
             // Intent, pass the Intent's extras to the fragment as arguments

@@ -4,7 +4,7 @@
     android:id="@+id/topLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.Android2.EditNode">
+    tools:context="com.Android2.view.EditNode">
 
     <!-- TODO: Update blank fragment layout -->
 

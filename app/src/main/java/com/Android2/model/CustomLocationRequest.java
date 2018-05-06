@@ -1,4 +1,4 @@
-package com.Android2;
+package com.Android2.model;
 
 import android.location.LocationManager;
 

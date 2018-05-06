@@ -41,17 +41,17 @@
             android:value="AIzaSyC-1J18Yd4SYEIbuftijF9VftPEYTmr_go" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".view.PrimaryMapFragment"
             android:label="@string/maps_label"></activity>
-        <activity android:name=".QRScannerActivity">
+        <activity android:name=".view.QRScannerActivity">
             android:parentActivityName=".MainActivity" >
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MapsActivity" />
+                android:value=".view.PrimaryMapFragment" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,5 +1,6 @@
-package com.Android2;
+package com.Android2.controller;
 
+import com.Android2.model.MapNode;
 import com.google.android.gms.maps.GoogleMap;
 
 /**
@@ -9,5 +10,5 @@ import com.google.android.gms.maps.GoogleMap;
 public interface IMapNodeController {
     void render(GoogleMap map);
 
-    Node getNode();
+    MapNode getNode();
 }

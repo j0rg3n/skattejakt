@@ -1,7 +1,8 @@
-package com.Android2;
+package com.Android2.controller;
 
 import android.graphics.Color;
 
+import com.Android2.model.MyLocationMapNode;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -10,8 +11,8 @@ import com.google.android.gms.maps.model.CircleOptions;
  * Created by cirkus on 24.07.2017.
  */
 
-public class MyLocationMapNodeController extends MapNodeControllerBase<MyLocationNode> {
-    public MyLocationMapNodeController(MyLocationNode node) {
+public class MyLocationMapNodeController extends MapNodeControllerBase<MyLocationMapNode> {
+    public MyLocationMapNodeController(MyLocationMapNode node) {
         super(node);
     }
 

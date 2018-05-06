@@ -1,4 +1,4 @@
-package com.Android2;
+package com.Android2.controller;
 
 import com.google.android.gms.maps.model.LatLng;
 
